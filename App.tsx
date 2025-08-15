@@ -71,7 +71,7 @@ export default function App() {
   const handleKeyPress = (e: any) => {
     if (loading) return;
     if (e.nativeEvent.key === "Backspace") {
-      if (selection.start >= 0 && selection.start < OTP_LENGTH) {
+      if (selection.start >= 0) {
         const updated = [...digits];
         updated[selection.start] = "";
         setDigits(updated);
@@ -89,11 +89,11 @@ export default function App() {
       setLoading(true);
       Keyboard.dismiss();
       await new Promise((res) => setTimeout(res, 1500));
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 1200);
+      alert(`Submitted code: ${value}`);
       setDigits(Array(OTP_LENGTH).fill(""));
       setSelection({ start: 0, end: 0 });
     } catch {
+      alert("Submission failed. Please try again.");
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -103,18 +103,15 @@ export default function App() {
     }
   };
 
-  const pasteDemo = () => {
-    const demo = "123456".split("");
-    setDigits(demo);
-    setSelection({ start: OTP_LENGTH, end: OTP_LENGTH });
-  };
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Text style={styles.title}>Enter the 6-digit code</Text>
-        {submitted && <Text testID="success-banner">Success</Text>}
-
+        {submitted && (
+          <Text accessibilityRole="alert" testID="success-banner">
+            Success
+          </Text>
+        )}
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => focusInput(selection.start)}
@@ -140,7 +137,6 @@ export default function App() {
             </TouchableOpacity>
           ))}
         </TouchableOpacity>
-
         <TextInput
           ref={inputRef}
           value=""
@@ -160,33 +156,25 @@ export default function App() {
           editable={!loading}
           testID="otp-input"
         />
-
         {!isComplete && (
-          <TouchableOpacity
-            style={[styles.submitBtn, { opacity: 0.5 }]}
-            onPress={handleSubmit}
-            disabled={!isComplete || loading}
-            testID="submit-btn"
-          >
-            <Text style={styles.submitLabel}>Submit</Text>
-          </TouchableOpacity>
+          <View style={styles.submitSlot}>
+            <TouchableOpacity
+              style={[styles.submitBtn, isComplete ? styles.hiddenBtn : null]}
+              onPress={handleSubmit}
+              disabled={isComplete || loading}
+              testID="submit-btn"
+            >
+              <Text style={styles.submitLabel}>Submit</Text>
+            </TouchableOpacity>
+          </View>
         )}
-
         {loading && (
           <View style={styles.loadingRow} testID="loading">
             <ActivityIndicator size="small" />
             <Text style={styles.loadingText}>Verifying…</Text>
           </View>
         )}
-
         <View style={{ height: 24 }} />
-        <TouchableOpacity
-          style={styles.helperBtn}
-          onPress={pasteDemo}
-          testID="paste-btn"
-        >
-          <Text style={styles.helperLabel}>Paste demo code</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -227,12 +215,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   hiddenInput: { position: "absolute", opacity: 0, height: 0, width: 0 },
-  submitBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#5b6cff",
-    borderRadius: 10,
-  },
   submitLabel: { color: "white", fontWeight: "700" },
   loadingRow: {
     flexDirection: "row",
@@ -249,4 +231,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   helperLabel: { color: "#9aa5b1", fontSize: 12 },
+  submitSlot: {
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
+  hiddenBtn: {
+    opacity: 0,
+  },
+  submitBtn: {
+    height: 48,
+    paddingHorizontal: 16,
+    backgroundColor: "#5b6cff",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

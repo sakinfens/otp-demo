@@ -51,8 +51,12 @@ describe("OTP UI behavior", () => {
     expectBoxToEqual(["1", "2", "", "", "", ""]);
   });
 
-  test("auto-submit shows loading then success banner, and resets boxes", async () => {
+  test("auto-submit triggers alert and resets boxes", async () => {
+    const alertMock = jest.fn(); // make a stub
+    (global as any).alert = alertMock; // attach it so code can call alert()
+
     render(<App />);
+
     await typeDigitAt(0, "1");
     await typeDigitAt(1, "2");
     await typeDigitAt(2, "3");
@@ -66,12 +70,7 @@ describe("OTP UI behavior", () => {
       jest.advanceTimersByTime(1500);
     });
 
-    expect(screen.getByTestId("success-banner")).toBeTruthy();
-
-    await act(async () => {
-      jest.advanceTimersByTime(1200);
-    });
-
+    expect(alertMock).toHaveBeenCalledWith("Submitted code: 123456");
     expectBoxToEqual(["", "", "", "", "", ""]);
   });
 
