@@ -1,23 +1,38 @@
 {
   "name": "otp-demo",
   "version": "1.0.0",
+  "private": true,
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
   "dependencies": {
-    "expo": "~53.0.20",
-    "expo-status-bar": "~2.2.3",
-    "react": "19.0.0",
-    "react-native": "0.79.5"
+    "expo": "~52.0.47",
+    "expo-status-bar": "~2.0.1",
+    "react": "18.3.1",
+    "react-native": "0.76.9",
+    "expo-updates": "~0.27.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.10",
-    "typescript": "~5.8.3"
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "13.2.2",
+    "@types/jest": "^30.0.0",
+    "@types/react": "18.3.23",
+    "jest-expo": "~52.0.0",
+    "metro": "^0.81.0",
+    "metro-config": "^0.81.0",
+    "metro-resolver": "^0.81.0",
+    "react-test-renderer": "18.3.1",
+    "typescript": "^5.4.0"
   },
-  "private": true
+  "overrides": {
+    "@types/react": "18.3.23"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  }
 }
