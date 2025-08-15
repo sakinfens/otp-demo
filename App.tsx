@@ -21,7 +21,6 @@ export default function App() {
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [selection, setSelection] = useState<Sel>({ start: 0, end: 0 });
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   const value = useMemo(() => digits.join(""), [digits]);
   const isComplete = value.length === OTP_LENGTH && !digits.includes("");
@@ -71,7 +70,7 @@ export default function App() {
   const handleKeyPress = (e: any) => {
     if (loading) return;
     if (e.nativeEvent.key === "Backspace") {
-      if (selection.start >= 0) {
+      if (selection.start >= 0 && selection.start < OTP_LENGTH) {
         const updated = [...digits];
         updated[selection.start] = "";
         setDigits(updated);
@@ -107,11 +106,7 @@ export default function App() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Text style={styles.title}>Enter the 6-digit code</Text>
-        {submitted && (
-          <Text accessibilityRole="alert" testID="success-banner">
-            Success
-          </Text>
-        )}
+
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => focusInput(selection.start)}
@@ -137,6 +132,7 @@ export default function App() {
             </TouchableOpacity>
           ))}
         </TouchableOpacity>
+
         <TextInput
           ref={inputRef}
           value=""
@@ -156,8 +152,14 @@ export default function App() {
           editable={!loading}
           testID="otp-input"
         />
-        {!isComplete && (
-          <View style={styles.submitSlot}>
+
+        <View style={styles.submitSlot}>
+          {loading ? (
+            <View style={styles.loadingRow} testID="loading">
+              <ActivityIndicator size="small" />
+              <Text style={styles.loadingText}>Verifying…</Text>
+            </View>
+          ) : (
             <TouchableOpacity
               style={[styles.submitBtn, isComplete ? styles.hiddenBtn : null]}
               onPress={handleSubmit}
@@ -166,14 +168,9 @@ export default function App() {
             >
               <Text style={styles.submitLabel}>Submit</Text>
             </TouchableOpacity>
-          </View>
-        )}
-        {loading && (
-          <View style={styles.loadingRow} testID="loading">
-            <ActivityIndicator size="small" />
-            <Text style={styles.loadingText}>Verifying…</Text>
-          </View>
-        )}
+          )}
+        </View>
+
         <View style={{ height: 24 }} />
       </View>
     </SafeAreaView>
@@ -223,23 +220,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   loadingText: { color: "#cbd5e1" },
-  helperBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: "#2a3350",
-    borderRadius: 10,
-  },
-  helperLabel: { color: "#9aa5b1", fontSize: 12 },
   submitSlot: {
     height: 48,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
   },
-  hiddenBtn: {
-    opacity: 0,
-  },
+  hiddenBtn: { opacity: 0 },
   submitBtn: {
     height: 48,
     paddingHorizontal: 16,
